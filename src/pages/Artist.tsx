@@ -49,7 +49,7 @@ const Artist = () => {
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Álbumes</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {artist?.albums.map((album: any) => (
+          {artist?.albums.map((album: { _id: string; image: string; name: string; releaseDate: string }) => (
             <Link
               key={album._id}
               to={`/album/${album._id}`}
