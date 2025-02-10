@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const GENRES = [
   "rap",
@@ -14,17 +15,40 @@ const GENRES = [
   "jazz",
 ];
 
+interface Artist {
+  _id: string;
+  name: string;
+  image: string;
+  genres: string[];
+}
+
 const Music = () => {
-  const { data: artistsByGenre, isLoading } = useQuery({
+  const { data: artistsByGenre, isLoading, error } = useQuery<Artist[]>({
     queryKey: ["artistsByGenre"],
     queryFn: async () => {
-      const response = await fetch("/api/artists/by-genre");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      try {
+        const response = await fetch("http://localhost:5000/api/artists/by-genre");
+        if (!response.ok) {
+          throw new Error("Error fetching artists");
+        }
+        return response.json();
+      } catch (err) {
+        console.error("Error fetching artists:", err);
+        toast.error("Error loading artists. Please try again later.");
+        throw err;
       }
-      return response.json();
     },
   });
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-red-400">
+          Error loading artists. Please try again later.
+        </h2>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -55,7 +79,7 @@ const Music = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {artistsByGenre?.map((artist: any) => (
+            {artistsByGenre?.map((artist) => (
               <Link
                 key={artist._id}
                 to={`/artist/${artist._id}`}

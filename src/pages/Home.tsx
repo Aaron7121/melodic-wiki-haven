@@ -1,18 +1,42 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+
+interface Artist {
+  _id: string;
+  name: string;
+  image: string;
+  genres: string[];
+}
 
 const Home = () => {
-  const { data: topArtists, isLoading } = useQuery({
+  const { data: topArtists, isLoading, error } = useQuery<Artist[]>({
     queryKey: ["topArtists"],
     queryFn: async () => {
-      const response = await fetch("/api/artists/top");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      try {
+        const response = await fetch("http://localhost:5000/api/artists/top");
+        if (!response.ok) {
+          throw new Error("Error fetching artists");
+        }
+        return response.json();
+      } catch (err) {
+        console.error("Error fetching artists:", err);
+        toast.error("Error loading artists. Please try again later.");
+        throw err;
       }
-      return response.json();
     },
   });
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-red-400">
+          Error loading artists. Please try again later.
+        </h2>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -36,7 +60,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {topArtists?.map((artist: any) => (
+            {topArtists?.map((artist) => (
               <Link
                 key={artist._id}
                 to={`/artist/${artist._id}`}
