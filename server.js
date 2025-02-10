@@ -1,25 +1,19 @@
-
-// server.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB:', err));
-
 // Define schemas
 const artistSchema = new mongoose.Schema({
   name: String,
@@ -92,8 +86,8 @@ app.get('/api/albums/:id', async (req, res) => {
 app.get('/api/songs/:id', async (req, res) => {
   try {
     const song = await Song.findById(req.params.id)
-        .populate('artists')
-        .populate('album');
+      .populate('artists')
+      .populate('album');
     res.json(song);
   } catch (error) {
     res.status(500).json({ message: error.message });
