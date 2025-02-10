@@ -1,7 +1,7 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const connectDB = require('./db');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -10,10 +10,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Error connecting to MongoDB:', err));
+// Connect to MongoDB
+connectDB();
+
+// Define schemas and routes here...
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 // Define schemas
 const artistSchema = new mongoose.Schema({
   name: String,
