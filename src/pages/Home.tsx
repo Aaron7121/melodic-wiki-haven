@@ -15,7 +15,7 @@ const Home = () => {
     queryKey: ["topArtists"],
     queryFn: async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/artists/top");
+        const response = await fetch("/api/artists/top");
         if (!response.ok) {
           throw new Error("Error fetching artists");
         }
